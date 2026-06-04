@@ -606,7 +606,7 @@
             this.Margin = new System.Windows.Forms.Padding(2);
             this.MinimumSize = new System.Drawing.Size(1100, 650);
             this.Name = "frmCliente";
-            this.Text = "frmCliente";
+            this.Text = "Gestión Clientes - AeroLink";
             this.pnlBotones.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.pnlCentral.ResumeLayout(false);

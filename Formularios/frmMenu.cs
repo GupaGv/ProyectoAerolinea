@@ -10,13 +10,14 @@ using System.Windows.Forms;
 
 namespace ProyectoAerolinea.Formularios
 {
-    public partial class frmMenu : Form
+    public partial class Aerolink : Form
     {
-        public frmMenu()
+        public Aerolink()
         {
             InitializeComponent();
             personalizarDiseño();
             tamanoOriginal = this.Size;
+            this.WindowState = FormWindowState.Maximized;
         }
         Size tamanoOriginal;
         private void personalizarDiseño()
@@ -65,15 +66,6 @@ namespace ProyectoAerolinea.Formularios
             pnlCentral.Tag = frmHijo;
             frmHijo.BringToFront();
             frmHijo.Show();
-
-            int anchoTotal = pnlLogo.Width + frmHijo.Width + 20;
-            int altoTotal = frmHijo.Height + 60;
-            this.Size = new Size(anchoTotal, altoTotal);
-
-            frmHijo.FormClosed += (s, args) =>
-            {
-                this.Size = tamanoOriginal;
-            };
         }
 
         // Botones principales
@@ -94,6 +86,11 @@ namespace ProyectoAerolinea.Formularios
         private void btnReservas_Click(object sender, EventArgs e)
         {
             mostrarSubMenu(pnlSubMenuReservas);
+        }
+        private void btnReportes_Click(object sender, EventArgs e)
+        {
+            AbrirenPanel(new frmReportes());
+            ocultarSubMenu();
         }
 
 
@@ -139,6 +136,12 @@ namespace ProyectoAerolinea.Formularios
         private void btnInformeVu_Click(object sender, EventArgs e)
         {
             AbrirenPanel(new frmInformeVuelo());
+            ocultarSubMenu();
+        }
+
+        private void btnInformeRe_Click(object sender, EventArgs e)
+        {
+            AbrirenPanel(new frmInformeReservas());
             ocultarSubMenu();
         }
     }

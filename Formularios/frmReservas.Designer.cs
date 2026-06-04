@@ -32,6 +32,7 @@
             this.panel9 = new System.Windows.Forms.Panel();
             this.pnlBotones = new System.Windows.Forms.Panel();
             this.btnLimpiar = new System.Windows.Forms.Button();
+            this.btnGenerarPDF = new System.Windows.Forms.Button();
             this.btnIngreso = new System.Windows.Forms.Button();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.btnGuardar = new System.Windows.Forms.Button();
@@ -39,6 +40,7 @@
             this.btnRetiro = new System.Windows.Forms.Button();
             this.btnConsulta = new System.Windows.Forms.Button();
             this.pnlCentral = new System.Windows.Forms.Panel();
+            this.btnPagar = new System.Windows.Forms.Button();
             this.btnCalcular = new System.Windows.Forms.Button();
             this.pnlResumen = new System.Windows.Forms.Panel();
             this.lblPrecioTotal = new System.Windows.Forms.Label();
@@ -50,12 +52,12 @@
             this.panel10 = new System.Windows.Forms.Panel();
             this.label8 = new System.Windows.Forms.Label();
             this.pnlDatosCliente = new System.Windows.Forms.Panel();
-            this.cmbCliente = new System.Windows.Forms.ComboBox();
+            this.panel11 = new System.Windows.Forms.Panel();
             this.panel14 = new System.Windows.Forms.Panel();
             this.label18 = new System.Windows.Forms.Label();
             this.txtEmailCliente = new System.Windows.Forms.TextBox();
+            this.txtCedula = new System.Windows.Forms.TextBox();
             this.panel2 = new System.Windows.Forms.Panel();
-            this.panel11 = new System.Windows.Forms.Panel();
             this.txtNombreCliente = new System.Windows.Forms.TextBox();
             this.label14 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
@@ -122,6 +124,7 @@
             // 
             this.pnlBotones.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(31)))), ((int)(((byte)(42)))), ((int)(((byte)(68)))));
             this.pnlBotones.Controls.Add(this.btnLimpiar);
+            this.pnlBotones.Controls.Add(this.btnGenerarPDF);
             this.pnlBotones.Controls.Add(this.btnIngreso);
             this.pnlBotones.Controls.Add(this.pictureBox1);
             this.pnlBotones.Controls.Add(this.btnGuardar);
@@ -154,6 +157,26 @@
             this.btnLimpiar.Text = "Limpiar";
             this.btnLimpiar.UseVisualStyleBackColor = false;
             this.btnLimpiar.Click += new System.EventHandler(this.btnLimpiar_Click);
+            // 
+            // btnGenerarPDF
+            // 
+            this.btnGenerarPDF.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.btnGenerarPDF.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(44)))), ((int)(((byte)(62)))), ((int)(((byte)(143)))));
+            this.btnGenerarPDF.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnGenerarPDF.FlatAppearance.BorderSize = 0;
+            this.btnGenerarPDF.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(22)))), ((int)(((byte)(45)))), ((int)(((byte)(107)))));
+            this.btnGenerarPDF.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(59)))), ((int)(((byte)(79)))), ((int)(((byte)(179)))));
+            this.btnGenerarPDF.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnGenerarPDF.Font = new System.Drawing.Font("Segoe UI Semibold", 10.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnGenerarPDF.ForeColor = System.Drawing.Color.White;
+            this.btnGenerarPDF.Location = new System.Drawing.Point(54, 699);
+            this.btnGenerarPDF.Margin = new System.Windows.Forms.Padding(2, 6, 2, 6);
+            this.btnGenerarPDF.Name = "btnGenerarPDF";
+            this.btnGenerarPDF.Size = new System.Drawing.Size(136, 37);
+            this.btnGenerarPDF.TabIndex = 93;
+            this.btnGenerarPDF.Text = "Generar PDF";
+            this.btnGenerarPDF.UseVisualStyleBackColor = false;
+            this.btnGenerarPDF.Click += new System.EventHandler(this.btnGenerarPDF_Click);
             // 
             // btnIngreso
             // 
@@ -271,6 +294,7 @@
             // pnlCentral
             // 
             this.pnlCentral.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(15)))), ((int)(((byte)(23)))), ((int)(((byte)(42)))));
+            this.pnlCentral.Controls.Add(this.btnPagar);
             this.pnlCentral.Controls.Add(this.btnCalcular);
             this.pnlCentral.Controls.Add(this.pnlResumen);
             this.pnlCentral.Controls.Add(this.panel9);
@@ -285,6 +309,26 @@
             this.pnlCentral.Size = new System.Drawing.Size(834, 764);
             this.pnlCentral.TabIndex = 58;
             // 
+            // btnPagar
+            // 
+            this.btnPagar.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.btnPagar.BackColor = System.Drawing.SystemColors.AppWorkspace;
+            this.btnPagar.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnPagar.FlatAppearance.BorderSize = 0;
+            this.btnPagar.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(22)))), ((int)(((byte)(45)))), ((int)(((byte)(107)))));
+            this.btnPagar.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(59)))), ((int)(((byte)(79)))), ((int)(((byte)(179)))));
+            this.btnPagar.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnPagar.Font = new System.Drawing.Font("Segoe UI Semibold", 10.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnPagar.ForeColor = System.Drawing.Color.White;
+            this.btnPagar.Location = new System.Drawing.Point(51, 699);
+            this.btnPagar.Margin = new System.Windows.Forms.Padding(2, 6, 2, 6);
+            this.btnPagar.Name = "btnPagar";
+            this.btnPagar.Size = new System.Drawing.Size(136, 37);
+            this.btnPagar.TabIndex = 30;
+            this.btnPagar.Text = "Pagar";
+            this.btnPagar.UseVisualStyleBackColor = false;
+            this.btnPagar.Click += new System.EventHandler(this.button1_Click);
+            // 
             // btnCalcular
             // 
             this.btnCalcular.Anchor = System.Windows.Forms.AnchorStyles.None;
@@ -296,7 +340,7 @@
             this.btnCalcular.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnCalcular.Font = new System.Drawing.Font("Segoe UI Semibold", 10.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnCalcular.ForeColor = System.Drawing.Color.White;
-            this.btnCalcular.Location = new System.Drawing.Point(272, 699);
+            this.btnCalcular.Location = new System.Drawing.Point(244, 699);
             this.btnCalcular.Margin = new System.Windows.Forms.Padding(2, 6, 2, 6);
             this.btnCalcular.Name = "btnCalcular";
             this.btnCalcular.Size = new System.Drawing.Size(136, 37);
@@ -427,12 +471,12 @@
             // 
             this.pnlDatosCliente.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.pnlDatosCliente.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(41)))), ((int)(((byte)(59)))));
-            this.pnlDatosCliente.Controls.Add(this.cmbCliente);
+            this.pnlDatosCliente.Controls.Add(this.panel11);
             this.pnlDatosCliente.Controls.Add(this.panel14);
             this.pnlDatosCliente.Controls.Add(this.label18);
             this.pnlDatosCliente.Controls.Add(this.txtEmailCliente);
+            this.pnlDatosCliente.Controls.Add(this.txtCedula);
             this.pnlDatosCliente.Controls.Add(this.panel2);
-            this.pnlDatosCliente.Controls.Add(this.panel11);
             this.pnlDatosCliente.Controls.Add(this.txtNombreCliente);
             this.pnlDatosCliente.Controls.Add(this.label14);
             this.pnlDatosCliente.Controls.Add(this.label2);
@@ -442,15 +486,14 @@
             this.pnlDatosCliente.Size = new System.Drawing.Size(380, 204);
             this.pnlDatosCliente.TabIndex = 88;
             // 
-            // cmbCliente
+            // panel11
             // 
-            this.cmbCliente.Font = new System.Drawing.Font("Segoe UI", 16.2F);
-            this.cmbCliente.FormattingEnabled = true;
-            this.cmbCliente.Location = new System.Drawing.Point(141, 44);
-            this.cmbCliente.Name = "cmbCliente";
-            this.cmbCliente.Size = new System.Drawing.Size(225, 38);
-            this.cmbCliente.TabIndex = 90;
-            this.cmbCliente.SelectedIndexChanged += new System.EventHandler(this.cmbCliente_SelectedIndexChanged);
+            this.panel11.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(58)))), ((int)(((byte)(138)))));
+            this.panel11.Location = new System.Drawing.Point(142, 78);
+            this.panel11.Margin = new System.Windows.Forms.Padding(2);
+            this.panel11.Name = "panel11";
+            this.panel11.Size = new System.Drawing.Size(225, 2);
+            this.panel11.TabIndex = 43;
             // 
             // panel14
             // 
@@ -489,6 +532,19 @@
             this.txtEmailCliente.Size = new System.Drawing.Size(226, 36);
             this.txtEmailCliente.TabIndex = 57;
             // 
+            // txtCedula
+            // 
+            this.txtCedula.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(243)))), ((int)(((byte)(244)))), ((int)(((byte)(246)))));
+            this.txtCedula.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.txtCedula.Enabled = false;
+            this.txtCedula.Font = new System.Drawing.Font("Segoe UI", 16.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.txtCedula.Location = new System.Drawing.Point(141, 44);
+            this.txtCedula.Margin = new System.Windows.Forms.Padding(2, 8, 2, 8);
+            this.txtCedula.Name = "txtCedula";
+            this.txtCedula.Size = new System.Drawing.Size(226, 36);
+            this.txtCedula.TabIndex = 59;
+            this.txtCedula.Leave += new System.EventHandler(this.txtCedula_Leave);
+            // 
             // panel2
             // 
             this.panel2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(58)))), ((int)(((byte)(138)))));
@@ -497,15 +553,6 @@
             this.panel2.Name = "panel2";
             this.panel2.Size = new System.Drawing.Size(225, 2);
             this.panel2.TabIndex = 47;
-            // 
-            // panel11
-            // 
-            this.panel11.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(58)))), ((int)(((byte)(138)))));
-            this.panel11.Location = new System.Drawing.Point(140, 82);
-            this.panel11.Margin = new System.Windows.Forms.Padding(2);
-            this.panel11.Name = "panel11";
-            this.panel11.Size = new System.Drawing.Size(225, 2);
-            this.panel11.TabIndex = 43;
             // 
             // txtNombreCliente
             // 
@@ -1033,7 +1080,7 @@
             this.Controls.Add(this.pnlBotones);
             this.MinimumSize = new System.Drawing.Size(1100, 801);
             this.Name = "frmReservas";
-            this.Text = "frmReservas";
+            this.Text = "Gestión Reservas - AeroLink";
             this.Load += new System.EventHandler(this.frmReservas_Load);
             this.pnlBotones.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
@@ -1092,7 +1139,6 @@
         private System.Windows.Forms.Panel pnlDatosCliente;
         private System.Windows.Forms.Panel pnlDetalleReserva;
         private System.Windows.Forms.Panel pnlDatosVuelo;
-        private System.Windows.Forms.ComboBox cmbCliente;
         private System.Windows.Forms.Panel panel14;
         private System.Windows.Forms.Label label18;
         private System.Windows.Forms.TextBox txtEmailCliente;
@@ -1123,5 +1169,8 @@
         private System.Windows.Forms.RadioButton rbEjecutivo;
         private System.Windows.Forms.NumericUpDown numPasajeros;
         private System.Windows.Forms.Button btnCalcular;
+        private System.Windows.Forms.Button btnGenerarPDF;
+        private System.Windows.Forms.Button btnPagar;
+        private System.Windows.Forms.TextBox txtCedula;
     }
 }

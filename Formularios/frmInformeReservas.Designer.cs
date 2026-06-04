@@ -1,6 +1,6 @@
 ﻿namespace ProyectoAerolinea.Formularios
 {
-    partial class frmInformeCliente
+    partial class frmInformeReservas
     {
         /// <summary>
         /// Required designer variable.
@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmInformeCliente));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmInformeReservas));
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
@@ -36,7 +36,7 @@
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.pnlCentral = new System.Windows.Forms.Panel();
             this.pnlGrid = new System.Windows.Forms.Panel();
-            this.dtgCliente = new System.Windows.Forms.DataGridView();
+            this.dtgReservas = new System.Windows.Forms.DataGridView();
             this.pnlTitulo = new System.Windows.Forms.Panel();
             this.label8 = new System.Windows.Forms.Label();
             this.panel10 = new System.Windows.Forms.Panel();
@@ -45,7 +45,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.pnlCentral.SuspendLayout();
             this.pnlGrid.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.dtgCliente)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dtgReservas)).BeginInit();
             this.pnlTitulo.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -85,7 +85,7 @@
             // pnlGrid
             // 
             this.pnlGrid.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(15)))), ((int)(((byte)(23)))), ((int)(((byte)(42)))));
-            this.pnlGrid.Controls.Add(this.dtgCliente);
+            this.pnlGrid.Controls.Add(this.dtgReservas);
             this.pnlGrid.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pnlGrid.Location = new System.Drawing.Point(0, 90);
             this.pnlGrid.Name = "pnlGrid";
@@ -93,18 +93,18 @@
             this.pnlGrid.Size = new System.Drawing.Size(1081, 371);
             this.pnlGrid.TabIndex = 3;
             // 
-            // dtgCliente
+            // dtgReservas
             // 
-            this.dtgCliente.AllowUserToAddRows = false;
-            this.dtgCliente.AllowUserToDeleteRows = false;
-            this.dtgCliente.AllowUserToOrderColumns = true;
+            this.dtgReservas.AllowUserToAddRows = false;
+            this.dtgReservas.AllowUserToDeleteRows = false;
+            this.dtgReservas.AllowUserToOrderColumns = true;
             dataGridViewCellStyle1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(28)))), ((int)(((byte)(52)))), ((int)(((byte)(88)))));
             dataGridViewCellStyle1.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(220)))), ((int)(((byte)(235)))), ((int)(((byte)(255)))));
-            this.dtgCliente.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle1;
-            this.dtgCliente.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
-            this.dtgCliente.BackgroundColor = System.Drawing.Color.FromArgb(((int)(((byte)(15)))), ((int)(((byte)(30)))), ((int)(((byte)(55)))));
-            this.dtgCliente.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.dtgCliente.ColumnHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.Single;
+            this.dtgReservas.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle1;
+            this.dtgReservas.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
+            this.dtgReservas.BackgroundColor = System.Drawing.Color.FromArgb(((int)(((byte)(15)))), ((int)(((byte)(30)))), ((int)(((byte)(55)))));
+            this.dtgReservas.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.dtgReservas.ColumnHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.Single;
             dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
             dataGridViewCellStyle2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(26)))), ((int)(((byte)(55)))), ((int)(((byte)(100)))));
             dataGridViewCellStyle2.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
@@ -112,9 +112,9 @@
             dataGridViewCellStyle2.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(26)))), ((int)(((byte)(55)))), ((int)(((byte)(100)))));
             dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
             dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.dtgCliente.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle2;
-            this.dtgCliente.ColumnHeadersHeight = 36;
-            this.dtgCliente.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
+            this.dtgReservas.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle2;
+            this.dtgReservas.ColumnHeadersHeight = 36;
+            this.dtgReservas.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
             dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
             dataGridViewCellStyle3.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(20)))), ((int)(((byte)(40)))), ((int)(((byte)(70)))));
             dataGridViewCellStyle3.Font = new System.Drawing.Font("Segoe UI", 9F);
@@ -123,19 +123,19 @@
             dataGridViewCellStyle3.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(65)))), ((int)(((byte)(120)))), ((int)(((byte)(200)))));
             dataGridViewCellStyle3.SelectionForeColor = System.Drawing.Color.White;
             dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.dtgCliente.DefaultCellStyle = dataGridViewCellStyle3;
-            this.dtgCliente.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.dtgCliente.EnableHeadersVisualStyles = false;
-            this.dtgCliente.GridColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(65)))), ((int)(((byte)(100)))));
-            this.dtgCliente.Location = new System.Drawing.Point(20, 10);
-            this.dtgCliente.MultiSelect = false;
-            this.dtgCliente.Name = "dtgCliente";
-            this.dtgCliente.ReadOnly = true;
-            this.dtgCliente.RowHeadersVisible = false;
-            this.dtgCliente.RowTemplate.Height = 28;
-            this.dtgCliente.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dtgCliente.Size = new System.Drawing.Size(1041, 341);
-            this.dtgCliente.TabIndex = 0;
+            this.dtgReservas.DefaultCellStyle = dataGridViewCellStyle3;
+            this.dtgReservas.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.dtgReservas.EnableHeadersVisualStyles = false;
+            this.dtgReservas.GridColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(65)))), ((int)(((byte)(100)))));
+            this.dtgReservas.Location = new System.Drawing.Point(20, 10);
+            this.dtgReservas.MultiSelect = false;
+            this.dtgReservas.Name = "dtgReservas";
+            this.dtgReservas.ReadOnly = true;
+            this.dtgReservas.RowHeadersVisible = false;
+            this.dtgReservas.RowTemplate.Height = 28;
+            this.dtgReservas.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
+            this.dtgReservas.Size = new System.Drawing.Size(1041, 341);
+            this.dtgReservas.TabIndex = 0;
             // 
             // pnlTitulo
             // 
@@ -157,7 +157,7 @@
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(1084, 50);
             this.label8.TabIndex = 0;
-            this.label8.Text = "Informe Clientes";
+            this.label8.Text = "Informe Reservas";
             this.label8.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // panel10
@@ -178,7 +178,7 @@
             this.panel9.Size = new System.Drawing.Size(3, 461);
             this.panel9.TabIndex = 1;
             // 
-            // frmInformeCliente
+            // frmInformeReservas
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -187,14 +187,14 @@
             this.Controls.Add(this.pnlCentral);
             this.Controls.Add(this.pnlBotones);
             this.MinimumSize = new System.Drawing.Size(1100, 650);
-            this.Name = "frmInformeCliente";
-            this.Text = "Informe de Clientes - AeroLink";
-            this.Load += new System.EventHandler(this.frmInformeCliente_Load);
+            this.Name = "frmInformeReservas";
+            this.Text = "Informe de Reservas - AeroLink";
+            this.Load += new System.EventHandler(this.frmInformeReservas_Load);
             this.pnlBotones.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.pnlCentral.ResumeLayout(false);
             this.pnlGrid.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.dtgCliente)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dtgReservas)).EndInit();
             this.pnlTitulo.ResumeLayout(false);
             this.ResumeLayout(false);
 
@@ -210,6 +210,6 @@
         private System.Windows.Forms.Label label8;
         private System.Windows.Forms.Panel panel10;
         private System.Windows.Forms.Panel pnlGrid;
-        private System.Windows.Forms.DataGridView dtgCliente;
+        private System.Windows.Forms.DataGridView dtgReservas;
     }
 }

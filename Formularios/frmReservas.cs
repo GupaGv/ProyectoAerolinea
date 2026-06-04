@@ -9,6 +9,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Net;
+using System.Net.Mail;
+using iTextSharp.text;
+using iTextSharp.text.pdf;
+using System.IO;
 
 namespace ProyectoAerolinea.Formularios
 {
@@ -19,6 +24,9 @@ namespace ProyectoAerolinea.Formularios
         SqlDataAdapter da;
         DataTable dt, dtBusqueda;
         int i, contador, boton;
+        private bool pagoCompletado = false;
+        private string metodoPagoSeleccionado = "";
+        private string cedulaClienteActual = "";
 
         public frmReservas()
         {
@@ -31,31 +39,9 @@ namespace ProyectoAerolinea.Formularios
 
         void CargarCatalogos()
         {
-            CargarClientes();
             CargarVuelos();
         }
 
-        void CargarClientes()
-        {
-            try
-            {
-                cmd = new SqlCommand(@"SELECT cedula,cedula + ' - ' + nombre + ' ' + apellido AS cliente FROM tblCliente ORDER BY nombre", cn.AbrirConexion());
-                da = new SqlDataAdapter(cmd);
-                DataTable dtClientes = new DataTable();
-                da.Fill(dtClientes);
-
-                cmbCliente.DataSource = dtClientes;
-                cmbCliente.DisplayMember = "cliente";
-                cmbCliente.ValueMember = "cedula";
-                cmbCliente.SelectedIndex = -1;
-
-                cn.CerrarConexion();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Error al cargar clientes: " + ex.Message);
-            }
-        }
 
         void CargarVuelos()
         {
@@ -197,7 +183,7 @@ namespace ProyectoAerolinea.Formularios
 
         void Habilitar()
         {
-            cmbCliente.Enabled = true;
+            txtCedula.Enabled = true;
             cmbVueloIda.Enabled = true;
             chkIdaVuelta.Enabled = true;
             numPasajeros.Enabled = true;
@@ -210,7 +196,7 @@ namespace ProyectoAerolinea.Formularios
 
         void Deshabilitar()
         {
-            cmbCliente.Enabled = false;
+            txtCedula.Enabled = false;
             cmbVueloIda.Enabled = false;
             cmbVueloVuelta.Enabled = false;
             chkIdaVuelta.Enabled = false;
@@ -238,7 +224,7 @@ namespace ProyectoAerolinea.Formularios
         void Limpiar()
         {
             txtCodigoReserva.Clear();
-            cmbCliente.SelectedIndex = -1;
+            txtCedula.Clear();
             cmbVueloIda.SelectedIndex = -1;
             cmbVueloVuelta.SelectedIndex = -1;
             chkIdaVuelta.Checked = false;
@@ -254,6 +240,13 @@ namespace ProyectoAerolinea.Formularios
             txtFechaSalida.Clear();
             txtPrecioBase.Clear();
             lblPrecioTotal.Text = "$0";
+
+            // Resetear estado del pago
+            pagoCompletado = false;
+            metodoPagoSeleccionado = "";
+            btnPagar.Text = "💳 Pagar";
+            btnPagar.BackColor = System.Drawing.Color.FromArgb(0, 114, 198);
+            btnPagar.ForeColor = System.Drawing.Color.White;
         }
 
         void Llenar(DataTable tabla, int indice)
@@ -269,8 +262,8 @@ namespace ProyectoAerolinea.Formularios
                 txtCodigoReserva.Text =
                     tabla.Rows[indice]["codigoReserva"].ToString();
 
-                cmbCliente.SelectedValue =
-                    tabla.Rows[indice]["cedula"].ToString();
+                txtCedula.Text = tabla.Rows[indice]["cedula"].ToString();
+                    cedulaClienteActual = txtCedula.Text;
 
                 cmbVueloIda.SelectedValue =
                     tabla.Rows[indice]["numeroVuelo"].ToString();
@@ -422,6 +415,341 @@ namespace ProyectoAerolinea.Formularios
             CalcularPrecioTotal();
         }
 
+
+
+        void BuscarClientePorCedula(string cedula)
+        {
+            if (string.IsNullOrWhiteSpace(cedula))
+            {
+                MessageBox.Show("Ingrese una cédula para buscar.");
+                return;
+            }
+
+            try
+            {
+                cn = new cConexion();
+                cmd = new SqlCommand(@"
+            SELECT nombre, apellido, email 
+            FROM tblCliente 
+            WHERE cedula = @cedula",
+                    cn.AbrirConexion());
+
+                cmd.Parameters.AddWithValue("@cedula", cedula);
+                SqlDataReader dr = cmd.ExecuteReader();
+
+                if (dr.Read())
+                {
+                    cedulaClienteActual = cedula;
+                    txtNombreCliente.Text = dr["nombre"].ToString() + " " + dr["apellido"].ToString();
+                    txtEmailCliente.Text = dr["email"].ToString();
+                    dr.Close();
+                    cn.CerrarConexion();
+                }
+                else
+                {
+                    dr.Close();
+                    cn.CerrarConexion();
+                    cedulaClienteActual = "";
+                    txtNombreCliente.Clear();
+                    txtEmailCliente.Clear();
+                    MessageBox.Show("No se encontró ningún cliente con la cédula: " + cedula,
+                                    "Cliente no encontrado", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    txtCedula.Focus();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error al buscar cliente:\n" + ex.Message);
+            }
+        }
+
+        byte[] GenerarPDFReservaIndividual(string codigoReserva)
+        {
+            try
+            {
+                // Consultar datos completos de esta reserva
+                cn = new cConexion();
+                cmd = new SqlCommand(@"
+            SELECT 
+                r.codigoReserva,
+                r.fechaReserva,
+                r.cantidadPasajeros,
+                r.tipoTiquete,
+                r.equipaje,
+                r.precioTotal,
+                r.estado,
+                r.idaVuelta,
+                c.nombre + ' ' + c.apellido AS cliente,
+                c.cedula,
+                c.email,
+                c.telefono,
+                v.numeroVuelo,
+                v.fechaSalida,
+                v.fechaLlegada,
+                v.precioBase,
+                d1.ciudad AS origen,
+                d1.pais AS paisOrigen,
+                d2.ciudad AS destino,
+                d2.pais AS paisDestino
+            FROM tblReserva r
+            INNER JOIN tblCliente c ON r.cedula = c.cedula
+            INNER JOIN tblVuelo v ON r.numeroVuelo = v.numeroVuelo
+            INNER JOIN tblDestino d1 ON v.origen = d1.codigoAeropuerto
+            INNER JOIN tblDestino d2 ON v.destino = d2.codigoAeropuerto
+            WHERE r.codigoReserva = @codigo",
+                    cn.AbrirConexion());
+
+                cmd.Parameters.AddWithValue("@codigo", codigoReserva);
+                da = new SqlDataAdapter(cmd);
+                DataTable dtR = new DataTable();
+                da.Fill(dtR);
+                cn.CerrarConexion();
+
+                if (dtR.Rows.Count == 0) return null;
+
+                DataRow r2 = dtR.Rows[0];
+
+                // Generar PDF en memoria (byte[]) para poder adjuntarlo al correo
+                using (MemoryStream ms = new MemoryStream())
+                {
+                    iTextSharp.text.Document doc = new iTextSharp.text.Document(
+                        iTextSharp.text.PageSize.A4, 40, 40, 40, 40);
+
+                    iTextSharp.text.pdf.PdfWriter.GetInstance(doc, ms);
+                    doc.Open();
+
+                    // ── Fuentes ──────────────────────────────────────────
+                    iTextSharp.text.Font fTitulo = new iTextSharp.text.Font(
+                        iTextSharp.text.Font.HELVETICA, 20f, iTextSharp.text.Font.BOLD,
+                        new iTextSharp.text.BaseColor(31, 73, 125));
+
+                    iTextSharp.text.Font fSubtitulo = new iTextSharp.text.Font(
+                        iTextSharp.text.Font.HELVETICA, 11f, iTextSharp.text.Font.BOLD,
+                        new iTextSharp.text.BaseColor(31, 73, 125));
+
+                    iTextSharp.text.Font fLabel = new iTextSharp.text.Font(
+                        iTextSharp.text.Font.HELVETICA, 9f, iTextSharp.text.Font.BOLD,
+                        iTextSharp.text.BaseColor.White);
+
+                    iTextSharp.text.Font fValor = new iTextSharp.text.Font(
+                        iTextSharp.text.Font.HELVETICA, 10f, iTextSharp.text.Font.NORMAL);
+
+                    iTextSharp.text.Font fValorBold = new iTextSharp.text.Font(
+                        iTextSharp.text.Font.HELVETICA, 10f, iTextSharp.text.Font.BOLD);
+
+                    iTextSharp.text.Font fPeque = new iTextSharp.text.Font(
+                        iTextSharp.text.Font.HELVETICA, 8f, iTextSharp.text.Font.NORMAL,
+                        iTextSharp.text.BaseColor.Gray);
+
+                    iTextSharp.text.BaseColor azul = new iTextSharp.text.BaseColor(31, 73, 125);
+                    iTextSharp.text.BaseColor azulClaro = new iTextSharp.text.BaseColor(220, 230, 241);
+
+                    // ── Encabezado ────────────────────────────────────────
+                    iTextSharp.text.Paragraph encabezado = new iTextSharp.text.Paragraph(
+                        "COMPROBANTE DE RESERVA\n", fTitulo);
+                    encabezado.Alignment = iTextSharp.text.Element.ALIGN_CENTER;
+                    doc.Add(encabezado);
+
+                    iTextSharp.text.Font fAerolinea = new iTextSharp.text.Font(
+                        iTextSharp.text.Font.HELVETICA, 10f, iTextSharp.text.Font.NORMAL,
+                        iTextSharp.text.BaseColor.Gray);
+                    iTextSharp.text.Paragraph subEnc = new iTextSharp.text.Paragraph(
+                        "Aerolínea - Sistema de Gestión de Reservas\n\n", fAerolinea);
+                    subEnc.Alignment = iTextSharp.text.Element.ALIGN_CENTER;
+                    doc.Add(subEnc);
+
+                    // ── Código y estado en una tabla de 2 columnas ────────
+                    iTextSharp.text.pdf.PdfPTable tblCodigo =
+                        new iTextSharp.text.pdf.PdfPTable(2);
+                    tblCodigo.WidthPercentage = 100;
+                    tblCodigo.SetWidths(new int[] { 50, 50 });
+                    tblCodigo.SpacingAfter = 12f;
+
+                    // Celda código
+                    iTextSharp.text.pdf.PdfPCell celdaCodigo =
+                        new iTextSharp.text.pdf.PdfPCell();
+                    celdaCodigo.BackgroundColor = azul;
+                    celdaCodigo.Padding = 8;
+                    celdaCodigo.AddElement(new iTextSharp.text.Paragraph(
+                        "CÓDIGO DE RESERVA", fLabel));
+                    iTextSharp.text.Font fCodigoValor = new iTextSharp.text.Font(
+                        iTextSharp.text.Font.HELVETICA, 16f, iTextSharp.text.Font.BOLD,
+                        iTextSharp.text.BaseColor.White);
+                    celdaCodigo.AddElement(new iTextSharp.text.Paragraph(
+                        r2["codigoReserva"].ToString(), fCodigoValor));
+                    tblCodigo.AddCell(celdaCodigo);
+
+                    // Celda estado
+                    string estado = r2["estado"].ToString();
+                    iTextSharp.text.BaseColor colorEstado =
+                        estado == "Confirmada" ? new iTextSharp.text.BaseColor(39, 119, 59) :
+                        estado == "Cancelada" ? new iTextSharp.text.BaseColor(180, 30, 30) :
+                                                 new iTextSharp.text.BaseColor(180, 130, 0);
+
+                    iTextSharp.text.pdf.PdfPCell celdaEstado =
+                        new iTextSharp.text.pdf.PdfPCell();
+                    celdaEstado.BackgroundColor = colorEstado;
+                    celdaEstado.Padding = 8;
+                    celdaEstado.AddElement(new iTextSharp.text.Paragraph(
+                        "ESTADO", fLabel));
+                    iTextSharp.text.Font fEstadoValor = new iTextSharp.text.Font(
+                        iTextSharp.text.Font.HELVETICA, 16f, iTextSharp.text.Font.BOLD,
+                        iTextSharp.text.BaseColor.White);
+                    celdaEstado.AddElement(new iTextSharp.text.Paragraph(
+                        estado.ToUpper(), fEstadoValor));
+                    tblCodigo.AddCell(celdaEstado);
+
+                    doc.Add(tblCodigo);
+
+                    // ── Sección: Datos del cliente ────────────────────────
+                    doc.Add(new iTextSharp.text.Paragraph("DATOS DEL CLIENTE\n", fSubtitulo));
+
+                    iTextSharp.text.pdf.PdfPTable tblCliente =
+                        new iTextSharp.text.pdf.PdfPTable(4);
+                    tblCliente.WidthPercentage = 100;
+                    tblCliente.SetWidths(new int[] { 20, 30, 20, 30 });
+                    tblCliente.SpacingAfter = 12f;
+
+                    AgregarFilaTabla(tblCliente, "Nombre completo",
+                        r2["cliente"].ToString(), "Cédula",
+                        r2["cedula"].ToString(), azulClaro, fLabel, fValor);
+
+                    AgregarFilaTabla(tblCliente, "Correo electrónico",
+                        r2["email"].ToString(), "Fecha de reserva",
+                        Convert.ToDateTime(r2["fechaReserva"]).ToString("dd/MM/yyyy HH:mm"),
+                        iTextSharp.text.BaseColor.White, fLabel, fValor);
+
+                    doc.Add(tblCliente);
+
+                    // ── Sección: Datos del vuelo ──────────────────────────
+                    doc.Add(new iTextSharp.text.Paragraph("DATOS DEL VUELO\n", fSubtitulo));
+
+                    iTextSharp.text.pdf.PdfPTable tblVuelo =
+                        new iTextSharp.text.pdf.PdfPTable(4);
+                    tblVuelo.WidthPercentage = 100;
+                    tblVuelo.SetWidths(new int[] { 20, 30, 20, 30 });
+                    tblVuelo.SpacingAfter = 12f;
+
+                    AgregarFilaTabla(tblVuelo, "Número de vuelo",
+                        r2["numeroVuelo"].ToString(), "Tipo de viaje",
+                        Convert.ToBoolean(r2["idaVuelta"]) ? "Ida y Vuelta" : "Solo ida",
+                        azulClaro, fLabel, fValor);
+
+                    AgregarFilaTabla(tblVuelo, "Origen",
+                        r2["origen"].ToString(), "Destino",
+                        r2["destino"].ToString(),
+                        iTextSharp.text.BaseColor.White, fLabel, fValor);
+
+                    AgregarFilaTabla(tblVuelo, "Fecha de salida",
+                        Convert.ToDateTime(r2["fechaSalida"]).ToString("dd/MM/yyyy HH:mm"),
+                        "Fecha de llegada",
+                        Convert.ToDateTime(r2["fechaLlegada"]).ToString("dd/MM/yyyy HH:mm"),
+                        azulClaro, fLabel, fValor);
+
+                    doc.Add(tblVuelo);
+
+                    // ── Sección: Detalles de la reserva ───────────────────
+                    doc.Add(new iTextSharp.text.Paragraph("DETALLES DE LA RESERVA\n", fSubtitulo));
+
+                    iTextSharp.text.pdf.PdfPTable tblDetalle =
+                        new iTextSharp.text.pdf.PdfPTable(4);
+                    tblDetalle.WidthPercentage = 100;
+                    tblDetalle.SetWidths(new int[] { 20, 30, 20, 30 });
+                    tblDetalle.SpacingAfter = 12f;
+
+                    AgregarFilaTabla(tblDetalle, "Pasajeros",
+                        r2["cantidadPasajeros"].ToString(), "Tipo de tiquete",
+                        r2["tipoTiquete"].ToString(),
+                        azulClaro, fLabel, fValor);
+
+                    AgregarFilaTabla(tblDetalle, "Equipaje",
+                        Convert.ToBoolean(r2["equipaje"]) ? "Incluido" : "No incluido",
+                        "Precio base",
+                        "$" + Convert.ToDecimal(r2["precioBase"]).ToString("N0"),
+                        iTextSharp.text.BaseColor.White, fLabel, fValor);
+
+                    doc.Add(tblDetalle);
+
+                    // ── Total ─────────────────────────────────────────────
+                    iTextSharp.text.pdf.PdfPTable tblTotal =
+                        new iTextSharp.text.pdf.PdfPTable(1);
+                    tblTotal.WidthPercentage = 40;
+                    tblTotal.HorizontalAlignment = iTextSharp.text.Element.ALIGN_RIGHT;
+                    tblTotal.SpacingAfter = 20f;
+
+                    iTextSharp.text.pdf.PdfPCell celdaTotal =
+                        new iTextSharp.text.pdf.PdfPCell();
+                    celdaTotal.BackgroundColor = azul;
+                    celdaTotal.Padding = 10;
+                    celdaTotal.HorizontalAlignment = iTextSharp.text.Element.ALIGN_CENTER;
+                    celdaTotal.AddElement(new iTextSharp.text.Paragraph(
+                        "TOTAL A PAGAR", fLabel));
+                    iTextSharp.text.Font fTotalValor = new iTextSharp.text.Font(
+                        iTextSharp.text.Font.HELVETICA, 18f, iTextSharp.text.Font.BOLD,
+                        iTextSharp.text.BaseColor.White);
+                    celdaTotal.AddElement(new iTextSharp.text.Paragraph(
+                        "$" + Convert.ToDecimal(r2["precioTotal"]).ToString("N0"),
+                        fTotalValor));
+                    tblTotal.AddCell(celdaTotal);
+                    doc.Add(tblTotal);
+
+                    // ── Pie de página ─────────────────────────────────────
+                    iTextSharp.text.Paragraph pie = new iTextSharp.text.Paragraph(
+                        "Este documento es el comprobante oficial de su reserva. " +
+                        "Preséntelo al momento del abordaje.\n" +
+                        "Generado el " + DateTime.Now.ToString("dd/MM/yyyy HH:mm"),
+                        fPeque);
+                    pie.Alignment = iTextSharp.text.Element.ALIGN_CENTER;
+                    doc.Add(pie);
+
+                    doc.Close();
+                    return ms.ToArray();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error al generar PDF de reserva:\n" + ex.Message);
+                return null;
+            }
+        }
+
+        // Método auxiliar para agregar filas de 4 columnas (label, valor, label, valor)
+        void AgregarFilaTabla(
+            iTextSharp.text.pdf.PdfPTable tabla,
+            string label1, string valor1,
+            string label2, string valor2,
+            iTextSharp.text.BaseColor colorFondo,
+            iTextSharp.text.Font fLabel,
+            iTextSharp.text.Font fValor)
+        {
+            iTextSharp.text.BaseColor azul = new iTextSharp.text.BaseColor(31, 73, 125);
+
+            iTextSharp.text.pdf.PdfPCell c1 = new iTextSharp.text.pdf.PdfPCell(
+                new iTextSharp.text.Phrase(label1, fLabel));
+            c1.BackgroundColor = azul;
+            c1.Padding = 5;
+
+            iTextSharp.text.pdf.PdfPCell c2 = new iTextSharp.text.pdf.PdfPCell(
+                new iTextSharp.text.Phrase(valor1, fValor));
+            c2.BackgroundColor = colorFondo;
+            c2.Padding = 5;
+
+            iTextSharp.text.pdf.PdfPCell c3 = new iTextSharp.text.pdf.PdfPCell(
+                new iTextSharp.text.Phrase(label2, fLabel));
+            c3.BackgroundColor = azul;
+            c3.Padding = 5;
+
+            iTextSharp.text.pdf.PdfPCell c4 = new iTextSharp.text.pdf.PdfPCell(
+                new iTextSharp.text.Phrase(valor2, fValor));
+            c4.BackgroundColor = colorFondo;
+            c4.Padding = 5;
+
+            tabla.AddCell(c1);
+            tabla.AddCell(c2);
+            tabla.AddCell(c3);
+            tabla.AddCell(c4);
+        }
+
         void CalcularPrecioTotal()
         {
             try
@@ -545,32 +873,6 @@ namespace ProyectoAerolinea.Formularios
         }
 
         // Eventos 
-
-        private void cmbCliente_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            if (cmbCliente.SelectedIndex != -1)
-            {
-                try
-                {
-                    string cedula = cmbCliente.SelectedValue.ToString();
-                    cmd = new SqlCommand("SELECT nombre, apellido, email FROM tblCliente WHERE cedula=@cedula", cn.AbrirConexion());
-                    cmd.Parameters.AddWithValue("@cedula", cedula);
-
-                    SqlDataReader reader = cmd.ExecuteReader();
-                    if (reader.Read())
-                    {
-                        txtNombreCliente.Text = reader["nombre"].ToString() + " " + reader["apellido"].ToString();
-                        txtEmailCliente.Text = reader["email"].ToString();
-                    }
-                    reader.Close();
-                    cn.CerrarConexion();
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("Error al cargar datos del cliente: " + ex.Message);
-                }
-            }
-        }
 
         private void cmbVueloIda_SelectedIndexChanged(object sender, EventArgs e)
         {
@@ -705,7 +1007,7 @@ namespace ProyectoAerolinea.Formularios
             Habilitar();
             txtCodigoReserva.Text = GenerarCodigoReserva();
             btnGuardar.Visible = true;
-            cmbCliente.Focus();
+            txtCedula.Focus();
         }
 
         private void btnModificiacion_Click(object sender, EventArgs e)
@@ -905,10 +1207,10 @@ namespace ProyectoAerolinea.Formularios
                 return;
             }
 
-            if (cmbCliente.SelectedIndex == -1)
+            if (string.IsNullOrWhiteSpace(cedulaClienteActual))
             {
-                MessageBox.Show("Debe seleccionar un cliente");
-                cmbCliente.Focus();
+                MessageBox.Show("Debe buscar un cliente por cédula");
+                txtCedula.Focus();
                 return;
             }
 
@@ -950,7 +1252,7 @@ namespace ProyectoAerolinea.Formularios
 
                 // Obtener datos
                 string codigoReserva = txtCodigoReserva.Text;
-                string cedula = cmbCliente.SelectedValue.ToString();
+                string cedula = cedulaClienteActual;
                 string numeroVuelo = cmbVueloIda.SelectedValue.ToString();
                 int cantidadPasajeros = (int)numPasajeros.Value;
                 string tipoTiquete = rbEconomico.Checked ? "Económico" :
@@ -961,6 +1263,16 @@ namespace ProyectoAerolinea.Formularios
 
                 if (boton == 1) // INGRESO
                 {
+                    if (!pagoCompletado)
+                    {
+                        MessageBox.Show("Debe completar el pago antes de guardar la reserva.",
+                                        "Pago pendiente", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        return;
+                    }
+
+                    // Forzar estado Confirmada porque el pago ya se hizo
+                    estado = "Confirmada";
+
                     // Insertar reserva
                     cmd = new SqlCommand(@"
                         INSERT INTO tblReserva 
@@ -1028,6 +1340,24 @@ namespace ProyectoAerolinea.Formularios
                     cmd.ExecuteNonQuery();
 
                     MessageBox.Show("Reserva registrada correctamente\nCódigo: " + codigoReserva);
+
+                    // Generar PDF del comprobante
+                    byte[] pdfBytes = GenerarPDFReservaIndividual(codigoReserva);
+
+                    // Enviar correo con el PDF adjunto
+                    EnviarCorreoConfirmacion(
+                        txtEmailCliente.Text,
+                        txtNombreCliente.Text,
+                        codigoReserva,
+                        cmbVueloIda.Text,
+                        txtOrigen.Text,
+                        txtDestino.Text,
+                        txtFechaSalida.Text,
+                        cantidadPasajeros,
+                        tipoTiquete,
+                        precioTotal,
+                        pdfBytes   // <-- nuevo parámetro
+                    );
                 }
                 else if (boton == 2) // MODIFICACIÓN
                 {
@@ -1129,6 +1459,69 @@ namespace ProyectoAerolinea.Formularios
             Deshabilitar();
         }
 
+        private void btnGenerarPDF_Click(object sender, EventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(txtCodigoReserva.Text))
+            {
+                MessageBox.Show("No hay ninguna reserva cargada. Busque o ingrese una reserva primero.");
+                return;
+            }
+
+            byte[] pdfBytes = GenerarPDFReservaIndividual(txtCodigoReserva.Text);
+
+            if (pdfBytes == null)
+            {
+                MessageBox.Show("No se pudo generar el PDF. Verifique que la reserva exista.");
+                return;
+            }
+
+            SaveFileDialog sfd = new SaveFileDialog();
+            sfd.Filter = "PDF (*.pdf)|*.pdf";
+            sfd.FileName = "Reserva_" + txtCodigoReserva.Text;
+
+            if (sfd.ShowDialog() != DialogResult.OK) return;
+
+            File.WriteAllBytes(sfd.FileName, pdfBytes);
+            MessageBox.Show("PDF generado correctamente.");
+            System.Diagnostics.Process.Start(sfd.FileName);
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            // Validar que haya un precio calculado antes de pagar
+            if (string.IsNullOrWhiteSpace(lblPrecioTotal.Text) ||
+                lblPrecioTotal.Text == "$0")
+            {
+                MessageBox.Show("Primero complete los datos de la reserva para calcular el precio.");
+                return;
+            }
+
+            decimal totalAPagar = Convert.ToDecimal(
+                lblPrecioTotal.Text.Replace("$", "").Replace(".", "").Replace(",", ""));
+
+            frmPago formPago = new frmPago(totalAPagar);
+
+            if (formPago.ShowDialog() == DialogResult.OK)
+            {
+                pagoCompletado = true;
+                metodoPagoSeleccionado = formPago.MetodoPago;
+
+                // Feedback visual al usuario
+                btnPagar.Text = "✔ Pago completado";
+                btnPagar.BackColor = System.Drawing.Color.FromArgb(39, 119, 59);
+                btnPagar.ForeColor = System.Drawing.Color.White;
+
+                MessageBox.Show("Pago registrado con " + metodoPagoSeleccionado +
+                                ".\nAhora puede guardar la reserva.");
+            }
+        }
+
+        private void txtCedula_Leave(object sender, EventArgs e)
+        {
+            if (!string.IsNullOrWhiteSpace(txtCedula.Text.Trim()))
+                BuscarClientePorCedula(txtCedula.Text.Trim());
+        }
+
         private void txtCodigoReserva_KeyDown_1(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Enter && (boton == 2 || boton == 3))
@@ -1168,6 +1561,62 @@ namespace ProyectoAerolinea.Formularios
             Limpiar();
             Deshabilitar();
             btnGuardar.Visible = false;
+        }
+
+        void EnviarCorreoConfirmacion(string emailCliente, string nombreCliente,
+            string codigoReserva, string vuelo, string origen, string destino,
+            string fechaSalida, int pasajeros, string tipo, decimal precioTotal,
+            byte[] pdfAdjunto)
+        {
+            try
+            {
+                SmtpClient smtp = new SmtpClient("smtp.gmail.com", 587);
+                smtp.EnableSsl = true;
+                smtp.UseDefaultCredentials = false;
+                smtp.Credentials = new NetworkCredential(
+                    "aerolink9097@gmail.com",
+                    "rgod uggg cygz qqiu"
+                );
+
+                MailMessage mensaje = new MailMessage();
+                mensaje.From = new MailAddress("aerolink9097@gmail.com", "Aerolínea");
+                mensaje.To.Add(emailCliente);
+                mensaje.Subject = "Confirmación de Reserva - " + codigoReserva;
+                mensaje.IsBodyHtml = true;
+
+                mensaje.Body = $@"
+            <h2>¡Reserva Confirmada!</h2>
+            <p>Estimado/a <b>{nombreCliente}</b>,</p>
+            <p>Su reserva ha sido registrada exitosamente. Encontrará el comprobante adjunto en este correo.</p>
+            <hr/>
+            <table border='1' cellpadding='6' cellspacing='0'>
+                <tr><td><b>Código de Reserva</b></td><td>{codigoReserva}</td></tr>
+                <tr><td><b>Vuelo</b></td><td>{vuelo}</td></tr>
+                <tr><td><b>Origen</b></td><td>{origen}</td></tr>
+                <tr><td><b>Destino</b></td><td>{destino}</td></tr>
+                <tr><td><b>Fecha de Salida</b></td><td>{fechaSalida}</td></tr>
+                <tr><td><b>Pasajeros</b></td><td>{pasajeros}</td></tr>
+                <tr><td><b>Tipo de Tiquete</b></td><td>{tipo}</td></tr>
+                <tr><td><b>Precio Total</b></td><td>${precioTotal:N0}</td></tr>
+            </table>
+            <br/>
+            <p>Gracias por volar con nosotros.</p>";
+
+                // Adjuntar el PDF si se generó correctamente
+                if (pdfAdjunto != null)
+                {
+                    MemoryStream msPDF = new MemoryStream(pdfAdjunto);
+                    mensaje.Attachments.Add(new Attachment(msPDF,
+                        "Reserva_" + codigoReserva + ".pdf", "application/pdf"));
+                }
+
+                smtp.Send(mensaje);
+                MessageBox.Show("Correo de confirmación enviado a: " + emailCliente);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("No se pudo enviar el correo:\n" + ex.Message);
+            }
         }
         #endregion
     }

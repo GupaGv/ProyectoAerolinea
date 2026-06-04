@@ -1,6 +1,6 @@
 ﻿namespace ProyectoAerolinea.Formularios
 {
-    partial class frmMenu
+    partial class Aerolink
     {
         /// <summary>
         /// Required designer variable.
@@ -28,7 +28,9 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Aerolink));
             this.pnlMenuLateral = new System.Windows.Forms.Panel();
+            this.btnReportes = new System.Windows.Forms.Button();
             this.pnlSubMenuReservas = new System.Windows.Forms.Panel();
             this.btnInformeRe = new System.Windows.Forms.Button();
             this.btnIngresoRe = new System.Windows.Forms.Button();
@@ -65,6 +67,7 @@
             // 
             this.pnlMenuLateral.AutoScroll = true;
             this.pnlMenuLateral.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(31)))), ((int)(((byte)(42)))), ((int)(((byte)(68)))));
+            this.pnlMenuLateral.Controls.Add(this.btnReportes);
             this.pnlMenuLateral.Controls.Add(this.pnlSubMenuReservas);
             this.pnlMenuLateral.Controls.Add(this.btnReservas);
             this.pnlMenuLateral.Controls.Add(this.pnlSubMenuVuelos);
@@ -78,8 +81,32 @@
             this.pnlMenuLateral.Location = new System.Drawing.Point(0, 0);
             this.pnlMenuLateral.Margin = new System.Windows.Forms.Padding(2);
             this.pnlMenuLateral.Name = "pnlMenuLateral";
-            this.pnlMenuLateral.Size = new System.Drawing.Size(250, 561);
+            this.pnlMenuLateral.Size = new System.Drawing.Size(250, 611);
             this.pnlMenuLateral.TabIndex = 31;
+            // 
+            // btnReportes
+            // 
+            this.btnReportes.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(44)))), ((int)(((byte)(62)))), ((int)(((byte)(143)))));
+            this.btnReportes.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnReportes.Dock = System.Windows.Forms.DockStyle.Top;
+            this.btnReportes.FlatAppearance.BorderSize = 0;
+            this.btnReportes.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(65)))), ((int)(((byte)(85)))));
+            this.btnReportes.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(44)))), ((int)(((byte)(62)))), ((int)(((byte)(143)))));
+            this.btnReportes.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnReportes.Font = new System.Drawing.Font("Segoe UI Semibold", 12.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnReportes.ForeColor = System.Drawing.Color.White;
+            this.btnReportes.Image = ((System.Drawing.Image)(resources.GetObject("btnReportes.Image")));
+            this.btnReportes.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnReportes.Location = new System.Drawing.Point(0, 675);
+            this.btnReportes.Margin = new System.Windows.Forms.Padding(2, 6, 2, 6);
+            this.btnReportes.Name = "btnReportes";
+            this.btnReportes.Padding = new System.Windows.Forms.Padding(10, 0, 0, 0);
+            this.btnReportes.Size = new System.Drawing.Size(233, 45);
+            this.btnReportes.TabIndex = 27;
+            this.btnReportes.Text = "     Reportes";
+            this.btnReportes.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnReportes.UseVisualStyleBackColor = false;
+            this.btnReportes.Click += new System.EventHandler(this.btnReportes_Click);
             // 
             // pnlSubMenuReservas
             // 
@@ -114,6 +141,7 @@
             this.btnInformeRe.Text = "       Informe";
             this.btnInformeRe.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.btnInformeRe.UseVisualStyleBackColor = false;
+            this.btnInformeRe.Click += new System.EventHandler(this.btnInformeRe_Click);
             // 
             // btnIngresoRe
             // 
@@ -441,7 +469,7 @@
             this.pnlCentral.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pnlCentral.Location = new System.Drawing.Point(250, 0);
             this.pnlCentral.Name = "pnlCentral";
-            this.pnlCentral.Size = new System.Drawing.Size(834, 561);
+            this.pnlCentral.Size = new System.Drawing.Size(834, 611);
             this.pnlCentral.TabIndex = 32;
             // 
             // panel9
@@ -451,31 +479,32 @@
             this.panel9.Location = new System.Drawing.Point(0, 0);
             this.panel9.Margin = new System.Windows.Forms.Padding(2);
             this.panel9.Name = "panel9";
-            this.panel9.Size = new System.Drawing.Size(3, 561);
+            this.panel9.Size = new System.Drawing.Size(3, 611);
             this.panel9.TabIndex = 57;
             // 
             // pictureBox1
             // 
             this.pictureBox1.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.pictureBox1.Image = global::ProyectoAerolinea.Properties.Resources.Logo_Proyecto;
-            this.pictureBox1.Location = new System.Drawing.Point(252, 155);
+            this.pictureBox1.Location = new System.Drawing.Point(252, 180);
             this.pictureBox1.Name = "pictureBox1";
             this.pictureBox1.Size = new System.Drawing.Size(355, 215);
             this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.pictureBox1.TabIndex = 0;
             this.pictureBox1.TabStop = false;
             // 
-            // frmMenu
+            // Aerolink
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
-            this.ClientSize = new System.Drawing.Size(1084, 561);
+            this.ClientSize = new System.Drawing.Size(1084, 611);
             this.Controls.Add(this.pnlCentral);
             this.Controls.Add(this.pnlMenuLateral);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MinimumSize = new System.Drawing.Size(950, 600);
-            this.Name = "frmMenu";
-            this.Text = "frmMenu";
+            this.Name = "Aerolink";
+            this.Text = "Aerolink - Sistema de Gestion de Aerolinea";
             this.pnlMenuLateral.ResumeLayout(false);
             this.pnlSubMenuReservas.ResumeLayout(false);
             this.pnlSubMenuVuelos.ResumeLayout(false);
@@ -513,5 +542,6 @@
         private System.Windows.Forms.Panel pnlSubMenuReservas;
         private System.Windows.Forms.Button btnInformeRe;
         private System.Windows.Forms.Button btnIngresoRe;
+        private System.Windows.Forms.Button btnReportes;
     }
 }
